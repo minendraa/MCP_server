@@ -1,0 +1,5 @@
+venv
+.env
+requirements.txt
+workflow.txt
+__pycache__
