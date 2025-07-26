@@ -1,9 +1,9 @@
+# agents.py
+# A base class for a generic AI agent.
+# The AI agent communicates with the OpenAI API to execute tasks.
+
 import os
 from openai import OpenAI
-
-# --- THIS IS THE KEY CHANGE ---
-# We no longer initialize the client here at the global level.
-# We will initialize it inside the agent class instead.
 
 class AIAgent:
     """A base class for a generic AI agent."""
@@ -13,13 +13,13 @@ class AIAgent:
         The system prompt defines the agent's role, personality, and capabilities.
         """
         self.system_prompt = system_prompt
-        # MODIFICATION: Initialize the client here!
+        # Create the OpenAI client instance here instead of at the global level.
         # This ensures it's created only after load_dotenv() has been called in main.py
-        try:
-            self.client = OpenAI()
-            # A quick check to see if the key is loaded.
-            if self.client.api_key is None:
-                raise ValueError("OpenAI API key is not set.")
+        self.client = OpenAI()
+        # A quick check to see if the key is loaded.
+        if self.client.api_key is None:
+            raise ValueError("OpenAI API key is not set.")
+        # Check for any errors during client initialization
         except Exception as e:
             print(f"Fatal Error during OpenAI client initialization in Agent: {e}")
             print("Please ensure your OPENAI_API_KEY is set in the .env file and load_dotenv() is called before creating an agent.")
@@ -32,7 +32,7 @@ class AIAgent:
         """
         print(f"------ [AGENT: {self.__class__.__name__}] is thinking... ------")
         try:
-            # MODIFICATION: Use the instance's client: self.client
+            # Use the instance's client: self.client
             response = self.client.chat.completions.create(
                 model=model,
                 messages=[
@@ -47,7 +47,7 @@ class AIAgent:
         except Exception as e:
             return f"An error occurred while communicating with OpenAI: {e}"
 
-# --- Specialized Agents (No changes needed here) ---
+# Specialized Agents
 
 class ResearcherAgent(AIAgent):
     """An AI agent specialized in gathering factual information and news."""
